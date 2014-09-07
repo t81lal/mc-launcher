@@ -75,7 +75,7 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 	
 	@Override
 	public void saveProfile(MinecraftProfile profile) throws Exception {
-		File newFile = new File(FileConstants.PROFILE_DIR, profile.getUsername() + ".profile.json");
+		File newFile = new File(FileConstants.PROFILE_DIR, profile.getGameUsername() + ".profile.json");
 		if (newFile.exists()) {
 			newFile.delete();
 		}
@@ -90,7 +90,7 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 	
 	@Override
 	public void removeProfile(MinecraftProfile profile) throws Exception {
-		File proFile = new File(FileConstants.PROFILE_DIR, profile.getUsername() + ".profile.json");
+		File proFile = new File(FileConstants.PROFILE_DIR, profile.getGameUsername() + ".profile.json");
 		if (proFile.exists()) {
 			proFile.delete();
 		}

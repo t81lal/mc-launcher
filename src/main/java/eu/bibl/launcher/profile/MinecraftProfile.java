@@ -2,6 +2,7 @@ package eu.bibl.launcher.profile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.Proxy;
 import java.util.UUID;
 import java.util.zip.DataFormatException;
@@ -15,36 +16,108 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
 public class MinecraftProfile {
 	
-	private String username;
+	private static Field accessTokenField;
+	
+	static {
+		Class<?> yggdrasilUserAuthenticationClass = YggdrasilUserAuthentication.class;
+		for (Field field : yggdrasilUserAuthenticationClass.getDeclaredFields()) {
+			if (field.getName().equals("accessToken")) {
+				accessTokenField = field;
+				accessTokenField.setAccessible(true);
+				break;
+			}
+		}
+	}
+	
+	private String clientToken;
+	private String authToken;
+	private String gameUsername;
+	private String loginUsername;
 	private String password;
 	
-	public MinecraftProfile(String username, String password) {
-		this.username = username;
+	public MinecraftProfile(String loginUsername, String password) {
+		this.loginUsername = loginUsername;
 		this.password = encrypt(password);
+		clientToken = UUID.randomUUID().toString();
 	}
 	
 	public YggdrasilUserAuthentication login() throws AuthenticationException {
-		YggdrasilUserAuthentication auth = loginWithPass(getPassword());
-		return auth;
+		if (authToken != null) {
+			try {
+				YggdrasilUserAuthentication auth = loginWithAuthToken();
+				return auth;
+			} catch (AuthenticationException e) {
+				setRandomToken();
+			}
+		}
+		
+		try {
+			YggdrasilUserAuthentication auth = loginWithPass();
+			return auth;
+		} catch (AuthenticationException e) {
+			throw e;
+		}
+		
 	}
 	
-	private YggdrasilUserAuthentication loginWithPass(String pass) throws AuthenticationException {
-		final YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
-		final YggdrasilUserAuthentication auth = new YggdrasilUserAuthentication(service, Agent.MINECRAFT);
+	private YggdrasilUserAuthentication loginWithAuthToken() throws AuthenticationException {
+		YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(Proxy.NO_PROXY, clientToken);
+		YggdrasilUserAuthentication auth = new YggdrasilUserAuthentication(service, Agent.MINECRAFT);
 		
-		auth.setUsername(username);
-		auth.setPassword(pass);
+		auth.setUsername(loginUsername);
+		try {
+			accessTokenField.set(auth, authToken);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new AuthenticationException("Unable to set accessToken field.");
+		}
 		auth.logIn();
 		
+		gameUsername = auth.getSelectedProfile().getName();
+		
 		return auth;
 	}
 	
-	public String getUsername() {
-		return username;
+	private YggdrasilUserAuthentication loginWithPass() throws AuthenticationException {
+		YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(Proxy.NO_PROXY, setRandomToken());
+		YggdrasilUserAuthentication auth = new YggdrasilUserAuthentication(service, Agent.MINECRAFT);
+		
+		auth.setUsername(loginUsername);
+		auth.setPassword(getPassword());
+		auth.logIn();
+		
+		authToken = auth.getAuthenticatedToken();
+		gameUsername = auth.getSelectedProfile().getName();
+		
+		return auth;
 	}
 	
-	public void setUsername(final String username) {
-		this.username = username;
+	public String getClientToken() {
+		return clientToken;
+	}
+	
+	public void setClientToken(String clientToken) {
+		this.clientToken = clientToken;
+	}
+	
+	public String setRandomToken() {
+		clientToken = UUID.randomUUID().toString();
+		return clientToken;
+	}
+	
+	public String getAuthenticatedToken() {
+		return authToken;
+	}
+	
+	public String getLoginUsername() {
+		return loginUsername;
+	}
+	
+	public void setLoginUsername(String loginUsername) {
+		this.loginUsername = loginUsername;
+	}
+	
+	public String getGameUsername() {
+		return gameUsername;
 	}
 	
 	public String getPassword() {
@@ -107,6 +180,6 @@ public class MinecraftProfile {
 	
 	@Override
 	public String toString() {
-		return username;
+		return gameUsername;
 	}
 }

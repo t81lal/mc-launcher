@@ -127,12 +127,26 @@ public class ProfilesTab extends JPanel implements ActionListener {
 			profile.login();
 			provider.saveProfile(profile);
 			table.addProfile(profile);
+			usernameField.setText("");
+			passwordField.setText("");
+			usernameField.requestFocus();
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Couldn't login: " + e.getMessage(), "Error logging in", JOptionPane.ERROR_MESSAGE);
+			new Thread() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't login: " + e.getMessage(), "Error logging in", JOptionPane.ERROR_MESSAGE);
+				}
+			}.start();
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Couldn't save: " + e.getMessage(), "Error saving profile", JOptionPane.ERROR_MESSAGE);
+			new Thread() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't save: " + e.getMessage(), "Error saving profile", JOptionPane.ERROR_MESSAGE);
+				}
+			}.start();
+			
 		}
 	}
 	
@@ -148,7 +162,7 @@ public class ProfilesTab extends JPanel implements ActionListener {
 	}
 	
 	public void select(MinecraftProfile profile) {
-		usernameField.setText(profile.getUsername());
+		usernameField.setText(profile.getLoginUsername());
 		passwordField.setText(profile.getPassword());
 	}
 }
