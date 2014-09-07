@@ -1,4 +1,4 @@
-package eu.bibl.launcher.ui.components;
+package eu.bibl.launcher.ui.components.profiles;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -39,6 +39,13 @@ public class ProfileTableModel extends DefaultTableModel implements TableModelLi
 	
 	public void addProfile(MinecraftProfile profile) {
 		// prevent duplicates
+		remove(profile);
+		super.addRow(new Object[] {
+				profile.getGameUsername(),
+				createStars(profile.getPassword().length()) });
+	}
+	
+	public void remove(MinecraftProfile profile) {
 		Vector<?> dataVector = getDataVector();
 		List<Integer> toRemove = new ArrayList<Integer>();
 		for (int i = 0; i < getRowCount(); i++) {
@@ -59,9 +66,7 @@ public class ProfileTableModel extends DefaultTableModel implements TableModelLi
 				dataVector.remove(i);
 			}
 		}
-		super.addRow(new Object[] {
-				profile.getGameUsername(),
-				createStars(profile.getPassword().length()) });
+		table.repaint();// wierd drawing bug if you dont
 	}
 	
 	private String createStars(int length) {
@@ -73,8 +78,10 @@ public class ProfileTableModel extends DefaultTableModel implements TableModelLi
 	}
 	
 	public MinecraftProfile getProfileAtRow(int row) {
+		if (row == -1)
+			return null;
 		String val = (String) getValueAt(row, 0);
-		return getByName(val);
+		return profileProvider.getByName(val);
 	}
 	
 	@Override
@@ -136,14 +143,6 @@ public class ProfileTableModel extends DefaultTableModel implements TableModelLi
 	// }
 	// }
 	// }
-	
-	public MinecraftProfile getByName(String name) {
-		for (MinecraftProfile profile : profileProvider.getLoadedProfiles()) {
-			if (name.equals(profile.getGameUsername()))
-				return profile;
-		}
-		return null;
-	}
 	
 	@Override
 	public void run() {

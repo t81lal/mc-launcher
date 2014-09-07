@@ -1,4 +1,4 @@
-package eu.bibl.launcher.ui.components;
+package eu.bibl.launcher.ui.components.profiles;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,12 +18,10 @@ import javax.swing.JTextField;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 
-import eu.bibl.launcher.FileConstants;
 import eu.bibl.launcher.profile.MinecraftProfile;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
-import eu.bibl.launcher.profile.providers.impl.MinecraftDirectoryProfileProvider;
 
-public class ProfilesTab extends JPanel implements ActionListener {
+public class ProfilesTab extends JPanel implements ActionListener, Runnable {
 	
 	private static final long serialVersionUID = -6507666299757482416L;
 	
@@ -33,19 +31,13 @@ public class ProfilesTab extends JPanel implements ActionListener {
 	private JButton loginButton;
 	private AccountsJTable table;
 	
-	public ProfilesTab() {
+	public ProfilesTab(ProfileProvider provider) {
 		super(new GridLayout(1, 2));
+		this.provider = provider;
 		initUI();
 	}
 	
 	private void initUI() {
-		provider = new MinecraftDirectoryProfileProvider(FileConstants.PROFILE_DIR);
-		try {
-			provider.load();
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error loading providers", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
 		table = new AccountsJTable(this, provider);
 		
 		JPanel textFieldPanel = new JPanel(new GridBagLayout());
@@ -107,7 +99,7 @@ public class ProfilesTab extends JPanel implements ActionListener {
 		// buttonPanel.add(removeButton, gbc);
 		
 		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		mainSplitPane.setResizeWeight(0.3D);
+		mainSplitPane.setResizeWeight(0.45D);
 		mainSplitPane.add(new JScrollPane(table));
 		
 		JSplitPane vertSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -120,11 +112,19 @@ public class ProfilesTab extends JPanel implements ActionListener {
 	}
 	
 	private void attemptAddProfile() {
+		new Thread(this).start();
+	}
+	
+	@Override
+	public void run() {
+		usernameField.setEnabled(false);
+		passwordField.setEnabled(false);
+		loginButton.setEnabled(false);
 		String username = usernameField.getText();
 		String password = new String(passwordField.getPassword());
 		MinecraftProfile profile = new MinecraftProfile(username, password);
 		try {
-			profile.login();
+			profile.login(provider);
 			provider.saveProfile(profile);
 			table.addProfile(profile);
 			usernameField.setText("");
@@ -132,22 +132,16 @@ public class ProfilesTab extends JPanel implements ActionListener {
 			usernameField.requestFocus();
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
-			new Thread() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't login: " + e.getMessage(), "Error logging in", JOptionPane.ERROR_MESSAGE);
-				}
-			}.start();
+			JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't login: " + e.getMessage(), "Error logging in", JOptionPane.ERROR_MESSAGE);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			new Thread() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't save: " + e.getMessage(), "Error saving profile", JOptionPane.ERROR_MESSAGE);
-				}
-			}.start();
-			
+			JOptionPane.showMessageDialog(ProfilesTab.this, "Couldn't save: " + e.getMessage(), "Error saving profile", JOptionPane.ERROR_MESSAGE);
 		}
+		
+		usernameField.setEnabled(true);
+		passwordField.setEnabled(true);
+		loginButton.setEnabled(true);
 	}
 	
 	@Override

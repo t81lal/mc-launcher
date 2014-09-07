@@ -1,9 +1,14 @@
-package eu.bibl.launcher.ui.components;
+package eu.bibl.launcher.ui.components.profiles;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -35,6 +40,41 @@ public class AccountsJTable extends JTable implements MouseListener {
 		}
 		setFillsViewportHeight(true);
 		addMouseListener(this);
+		
+		final JPopupMenu popupMenu = new JPopupMenu();
+		JMenuItem deleteItem = new JMenuItem("Remove");
+		deleteItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int row = getSelectedRow();
+				MinecraftProfile profile = ((ProfileTableModel) getModel()).getProfileAtRow(row);
+				if (profile != null) {
+					try {
+						if (provider.isSelectedProfile(profile)) {
+							provider.setSelectedProfile(null);
+						}
+						provider.removeProfile(profile);
+						((ProfileTableModel) getModel()).remove(profile);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(AccountsJTable.this, "Error deleting: " + e1.getMessage(), "Error removing profile", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				
+			}
+		});
+		JMenuItem selectItem = new JMenuItem("Set selected");
+		selectItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int row = getSelectedRow();
+				MinecraftProfile profile = ((ProfileTableModel) getModel()).getProfileAtRow(row);
+				provider.setSelectedProfile(profile);
+			}
+		});
+		popupMenu.add(selectItem);
+		popupMenu.add(deleteItem);
+		setComponentPopupMenu(popupMenu);
 	}
 	
 	public void addProfile(MinecraftProfile profile) {
@@ -51,6 +91,11 @@ public class AccountsJTable extends JTable implements MouseListener {
 		AccountsJTable table = (AccountsJTable) e.getSource();
 		Point p = e.getPoint();
 		int row = table.rowAtPoint(p);
+		if ((row >= 0) && (row < getRowCount())) {
+			setRowSelectionInterval(row, row);
+		} else {
+			clearSelection();
+		}
 		if (e.getClickCount() == 2) {
 			MinecraftProfile profile = ((ProfileTableModel) table.getModel()).getProfileAtRow(row);
 			tab.select(profile);

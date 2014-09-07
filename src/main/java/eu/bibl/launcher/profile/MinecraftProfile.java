@@ -14,6 +14,8 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
+import eu.bibl.launcher.profile.providers.ProfileProvider;
+
 public class MinecraftProfile {
 	
 	private static Field accessTokenField;
@@ -41,10 +43,11 @@ public class MinecraftProfile {
 		clientToken = UUID.randomUUID().toString();
 	}
 	
-	public YggdrasilUserAuthentication login() throws AuthenticationException {
+	public YggdrasilUserAuthentication login(ProfileProvider provider) throws AuthenticationException {
 		if (authToken != null) {
 			try {
 				YggdrasilUserAuthentication auth = loginWithAuthToken();
+				provider.authenticated(this, auth);
 				return auth;
 			} catch (AuthenticationException e) {
 				setRandomToken();
@@ -53,6 +56,7 @@ public class MinecraftProfile {
 		
 		try {
 			YggdrasilUserAuthentication auth = loginWithPass();
+			provider.authenticated(this, auth);
 			return auth;
 		} catch (AuthenticationException e) {
 			throw e;
@@ -181,5 +185,17 @@ public class MinecraftProfile {
 	@Override
 	public String toString() {
 		return gameUsername;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MinecraftProfile other = (MinecraftProfile) obj;
+		return other.gameUsername.equals(gameUsername) && other.loginUsername.equals(loginUsername);
 	}
 }

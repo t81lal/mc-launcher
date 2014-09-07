@@ -95,4 +95,9 @@ public class MinecraftVersion {
 	public void setJarDir(File directory) {
 		jarDir = directory;
 	}
+	
+	@Override
+	public String toString() {
+		return id;
+	}
 }
