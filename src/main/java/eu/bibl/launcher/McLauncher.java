@@ -2,14 +2,10 @@ package eu.bibl.launcher;
 
 import java.awt.Toolkit;
 import java.io.File;
-import java.util.UUID;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.mojang.util.UUIDTypeAdapter;
-
-import eu.bibl.banalysis.AnalysisCore;
 import eu.bibl.launcher.ui.LauncherFrame;
 
 public class McLauncher {
@@ -20,7 +16,6 @@ public class McLauncher {
 				file.mkdirs();
 			}
 		}
-		AnalysisCore.GSON_INSTANCE = AnalysisCore.getBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e1) {
