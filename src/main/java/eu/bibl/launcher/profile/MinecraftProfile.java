@@ -1,19 +1,20 @@
 package eu.bibl.launcher.profile;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.net.Proxy;
+import java.util.UUID;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import eu.bibl.launcher.profile.providers.ProfileProvider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.Proxy;
-import java.util.UUID;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
+import eu.bibl.launcher.profile.providers.ProfileProvider;
 
 public class MinecraftProfile {
 	
@@ -140,45 +141,26 @@ public class MinecraftProfile {
 		}
 	}
 	
-	private String encrypt(String pass) {
-		byte[] compressed;
-		final Deflater compressor = new Deflater();
-		compressor.setLevel(Deflater.BEST_COMPRESSION);
-		compressor.setInput(pass.getBytes());
-		compressor.finish();
-		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(pass.length())) {
-			final byte[] buf = new byte[1024];
-			while (!compressor.finished()) {
-				final int count = compressor.deflate(buf);
-				bos.write(buf, 0, count);
-			}
-			compressed = bos.toByteArray();
-		} catch (final IOException e) {
-			throw new RuntimeException(e);
+	private static BASE64Encoder enc = new BASE64Encoder();
+	private static BASE64Decoder dec = new BASE64Decoder();
+	
+	public String encrypt(String text) {
+		try {
+			String rez = enc.encode(text.getBytes("UTF-8"));
+			return rez;
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
 		}
-		return new String(compressed);
 	}
 	
-	private String decrypt(String pass) {
-		final Inflater decompressor = new Inflater();
-		decompressor.setInput(pass.getBytes());
-		byte[] decompressed = new byte[] {};
-		final ByteArrayOutputStream bos = new ByteArrayOutputStream(pass.length());
+	public String decrypt(String text) {
 		try {
-			final byte[] buf = new byte[1024];
-			while (!decompressor.finished()) {
-				try {
-					final int count = decompressor.inflate(buf);
-					bos.write(buf, 0, count);
-				} catch (final DataFormatException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			decompressed = bos.toByteArray();
-			bos.close();
-		} catch (final IOException e) {
+			return new String(dec.decodeBuffer(text), "UTF-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
 		}
-		return new String(decompressed);
 	}
 	
 	@Override
