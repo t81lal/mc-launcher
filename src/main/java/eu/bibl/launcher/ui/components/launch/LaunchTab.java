@@ -1,16 +1,21 @@
 package eu.bibl.launcher.ui.components.launch;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.io.IOException;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 import eu.bibl.launcher.profile.MinecraftProfile;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
 import eu.bibl.launcher.ui.components.img.ImagePanel;
 import eu.bibl.launcher.version.json.MinecraftVersion;
 import eu.bibl.launcher.version.providers.VersionsProvider;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.util.List;
 
 public class LaunchTab extends JPanel {
 	
@@ -32,45 +37,43 @@ public class LaunchTab extends JPanel {
 		List<MinecraftVersion> versions = versionsProvider.getLoadedVersions();
 		JComboBox<MinecraftProfile> profileComboBox = new JComboBox<MinecraftProfile>(profiles.toArray(new MinecraftProfile[profiles.size()]));
 		JComboBox<MinecraftVersion> versionComboBox = new JComboBox<MinecraftVersion>(versions.toArray(new MinecraftVersion[versions.size()]));
-        JButton btn = new JButton();
-        btn.setText("Launch!");
-        ImagePanel imgPanel = null;
-        try {
-            imgPanel = new ImagePanel(this.getClass().getClassLoader().getResourceAsStream("rsrc/dank.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        JPanel tempPanel = new JPanel(new GridBagLayout());
-
-        Dimension d = new Dimension(120, 25);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.ipadx = 150;
-        tempPanel.add(profileComboBox, gbc);
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        tempPanel.add(versionComboBox, gbc);
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.ipadx = 175;
-        gbc.ipady = 30;
-        tempPanel.add(btn, gbc);
-
-
-
-        gbc.gridheight = 2;
-        if (imgPanel != null) {
-            add(imgPanel);
-        }
+		JButton btn = new JButton();
+		btn.setText("Launch!");
+		ImagePanel imgPanel = null;
+		try {
+			imgPanel = new ImagePanel(this.getClass().getClassLoader().getResourceAsStream("dank.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JPanel tempPanel = new JPanel(new GridBagLayout());
+		
+		Dimension d = new Dimension(120, 25);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.ipadx = 150;
+		tempPanel.add(profileComboBox, gbc);
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		tempPanel.add(versionComboBox, gbc);
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.ipadx = 175;
+		gbc.ipady = 30;
+		tempPanel.add(btn, gbc);
+		
+		gbc.gridheight = 2;
+		if (imgPanel != null) {
+			add(imgPanel);
+		}
 		add(tempPanel);
 	}
 }
