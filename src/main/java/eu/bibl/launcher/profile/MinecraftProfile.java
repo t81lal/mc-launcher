@@ -144,10 +144,10 @@ public class MinecraftProfile {
 	private static BASE64Encoder enc = new BASE64Encoder();
 	private static BASE64Decoder dec = new BASE64Decoder();
 	
-	public String encrypt(String text) {
+	public String encrypt(String pass) {
 		try {
-			String rez = enc.encode(text.getBytes("UTF-8"));
-			return rez;
+			String encrypted = enc.encode(pass.getBytes("UTF-8"));
+			return xorMessage(encrypted);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;
@@ -156,9 +156,33 @@ public class MinecraftProfile {
 	
 	public String decrypt(String text) {
 		try {
+			text = xorMessage(text);
 			return new String(dec.decodeBuffer(text), "UTF-8");
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private String xorMessage(String s) {
+		try {
+			if ((s == null) || (loginUsername == null))
+				return null;
+			
+			char[] keys = loginUsername.toCharArray();
+			char[] mesg = s.toCharArray();
+			
+			int ml = mesg.length;
+			int kl = keys.length;
+			char[] newmsg = new char[ml];
+			
+			for (int i = 0; i < ml; i++) {
+				newmsg[i] = (char) (mesg[i] ^ keys[i % kl]);
+			}// for i
+			mesg = null;
+			keys = null;
+			return new String(newmsg);
+		} catch (Exception e) {
 			return null;
 		}
 	}
