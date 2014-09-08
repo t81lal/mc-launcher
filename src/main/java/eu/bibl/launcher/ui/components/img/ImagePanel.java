@@ -29,6 +29,19 @@ public class ImagePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(image, 0, 0, null); // see javadoc for more info on the parameters
+        int width = this.getWidth();
+        int height = this.getHeight();
+        float scale = 0.99f;
+        float imgW = image.getWidth(null);
+        float imgH = image.getHeight(null);
+        while (imgW > width || imgH > height) {
+            imgW = imgW * scale;
+            imgH = imgH * scale;
+        }
+        int w = (int)imgW;
+        int h = (int)imgH;
+        int x = w / 2;
+        int y = h / 2 - (h / 2);
+        g.drawImage(image, x, y, w, h, null); // see javadoc for more info on the parameters
     }
 }
