@@ -1,18 +1,5 @@
 package eu.bibl.launcher.ui;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import eu.bibl.launcher.FileConstants;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
 import eu.bibl.launcher.profile.providers.impl.MinecraftDirectoryProfileProvider;
@@ -21,12 +8,17 @@ import eu.bibl.launcher.ui.components.profiles.ProfilesTab;
 import eu.bibl.launcher.version.providers.VersionsProvider;
 import eu.bibl.launcher.version.providers.impl.MinecraftDirectoryVersionsProvider;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class LauncherFrame extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 2250029339405240593L;
 	
 	public LauncherFrame() {
-		super("McLauncher - #Bibl");
+		super("DankClient Launcher - #Bibl");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		setLayout(new BorderLayout());

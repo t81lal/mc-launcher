@@ -1,5 +1,11 @@
 package eu.bibl.launcher.profile;
 
+import com.mojang.authlib.Agent;
+import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+import eu.bibl.launcher.profile.providers.ProfileProvider;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -8,13 +14,6 @@ import java.util.UUID;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
-import com.mojang.authlib.Agent;
-import com.mojang.authlib.exceptions.AuthenticationException;
-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-
-import eu.bibl.launcher.profile.providers.ProfileProvider;
 
 public class MinecraftProfile {
 	
@@ -142,7 +141,7 @@ public class MinecraftProfile {
 	}
 	
 	private String encrypt(String pass) {
-		byte[] compressed = new byte[] {};
+		byte[] compressed;
 		final Deflater compressor = new Deflater();
 		compressor.setLevel(Deflater.BEST_COMPRESSION);
 		compressor.setInput(pass.getBytes());

@@ -1,17 +1,15 @@
 package eu.bibl.launcher.ui.components.launch;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.util.List;
-
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-
 import eu.bibl.launcher.profile.MinecraftProfile;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
+import eu.bibl.launcher.ui.components.img.ImagePanel;
 import eu.bibl.launcher.version.json.MinecraftVersion;
 import eu.bibl.launcher.version.providers.VersionsProvider;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
 
 public class LaunchTab extends JPanel {
 	
@@ -21,7 +19,7 @@ public class LaunchTab extends JPanel {
 	private VersionsProvider versionsProvider;
 	
 	public LaunchTab(ProfileProvider profileProvider, VersionsProvider versionsProvider) {
-		super(new GridLayout(4, 1));
+		super(new GridLayout(1, 1));
 		this.profileProvider = profileProvider;
 		this.versionsProvider = versionsProvider;
 		
@@ -33,19 +31,38 @@ public class LaunchTab extends JPanel {
 		List<MinecraftVersion> versions = versionsProvider.getLoadedVersions();
 		JComboBox<MinecraftProfile> profileComboBox = new JComboBox<MinecraftProfile>(profiles.toArray(new MinecraftProfile[profiles.size()]));
 		JComboBox<MinecraftVersion> versionComboBox = new JComboBox<MinecraftVersion>(versions.toArray(new MinecraftVersion[versions.size()]));
-		
-		JPanel tempPanel = new JPanel(new GridBagLayout());
-		
+        ImagePanel imgPanel = null;
+        try {
+            imgPanel = new ImagePanel(this.getClass().getClassLoader().getResourceAsStream("rsrc/dank.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JPanel tempPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
-		tempPanel.add(profileComboBox, gbc);
+        if (imgPanel != null) {
+            tempPanel.add(imgPanel, gbc);
+        } else {
+            tempPanel.add(profileComboBox, gbc);
+        }
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		tempPanel.add(versionComboBox, gbc);
+        if (imgPanel != null) {
+            tempPanel.add(profileComboBox, gbc);
+        } else {
+            tempPanel.add(versionComboBox, gbc);
+        }
+
+        if (imgPanel != null) {
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            tempPanel.add(versionComboBox, gbc);
+        }
 		
 		add(tempPanel);
 	}
