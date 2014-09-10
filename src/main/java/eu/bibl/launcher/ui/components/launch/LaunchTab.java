@@ -1,21 +1,15 @@
 package eu.bibl.launcher.ui.components.launch;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.io.IOException;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-
 import eu.bibl.launcher.profile.MinecraftProfile;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
 import eu.bibl.launcher.ui.components.img.ImagePanel;
 import eu.bibl.launcher.version.json.MinecraftVersion;
 import eu.bibl.launcher.version.providers.VersionsProvider;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
 
 public class LaunchTab extends JPanel {
 	
@@ -41,7 +35,7 @@ public class LaunchTab extends JPanel {
 		btn.setText("Launch!");
 		ImagePanel imgPanel = null;
 		try {
-			imgPanel = new ImagePanel(this.getClass().getClassLoader().getResourceAsStream("dank.png"));
+			imgPanel = new ImagePanel(this.getClass().getClassLoader().getResourceAsStream("/dank/dank.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
