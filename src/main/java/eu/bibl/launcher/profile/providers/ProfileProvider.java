@@ -1,14 +1,14 @@
 package eu.bibl.launcher.profile.providers;
 
+import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+import eu.bibl.config.Config;
+import eu.bibl.launcher.profile.MinecraftProfile;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-
-import eu.bibl.config.Config;
-import eu.bibl.launcher.profile.MinecraftProfile;
+import java.util.function.Consumer;
 
 public abstract class ProfileProvider {
 	
@@ -16,10 +16,15 @@ public abstract class ProfileProvider {
 	protected List<MinecraftProfile> loadedProfiles;
 	protected Map<MinecraftProfile, YggdrasilUserAuthentication> authKeys;
 	protected MinecraftProfile selectedProfile;
+
+    protected List<Consumer<MinecraftProfile>> saveHandlerList;
+    protected List<Consumer<MinecraftProfile>> removeHandlerList;
 	
 	public ProfileProvider() {
-		loadedProfiles = new ArrayList<MinecraftProfile>();
-		authKeys = new HashMap<MinecraftProfile, YggdrasilUserAuthentication>();
+		loadedProfiles = new ArrayList<>();
+		authKeys = new HashMap<>();
+        saveHandlerList = new ArrayList<>();
+        removeHandlerList = new ArrayList<>();
 	}
 	
 	public abstract void load() throws Exception;
@@ -29,7 +34,25 @@ public abstract class ProfileProvider {
 	public abstract void saveProfile(MinecraftProfile profile) throws Exception;
 	
 	public abstract void removeProfile(MinecraftProfile profile) throws Exception;
-	
+
+    public void addSaveHandler(Consumer<MinecraftProfile> onSv) {
+        this.saveHandlerList.add(onSv);
+    }
+
+    public void addRemoveHandler(Consumer<MinecraftProfile> onRm) {
+        this.removeHandlerList.add(onRm);
+    }
+
+    protected void onSave(MinecraftProfile profile) {
+        for (Consumer<MinecraftProfile> saver : saveHandlerList)
+            saver.accept(profile);
+    }
+
+    protected void onRemove(MinecraftProfile profile) {
+        for (Consumer<MinecraftProfile> remover : removeHandlerList)
+            remover.accept(profile);
+    }
+
 	public YggdrasilUserAuthentication getAuth(MinecraftProfile profile) {
 		return authKeys.get(profile);
 	}

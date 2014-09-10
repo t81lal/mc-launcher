@@ -1,16 +1,11 @@
 package eu.bibl.launcher.profile.providers.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import eu.bibl.banalysis.AnalysisCore;
 import eu.bibl.launcher.FileConstants;
 import eu.bibl.launcher.profile.MinecraftProfile;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
+
+import java.io.*;
 
 /**
  * Profile provider.
@@ -86,6 +81,7 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 		writer.write(jsonString);
 		writer.close();
 		loadedProfiles.add(profile);
+        onSave(profile);
 	}
 	
 	@Override
@@ -97,5 +93,6 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 		// fixed it
 		loadedProfiles.remove(profile);
 		// this
+        onRemove(profile);
 	}
 }

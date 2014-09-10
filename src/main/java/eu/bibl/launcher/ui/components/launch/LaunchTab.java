@@ -32,6 +32,10 @@ public class LaunchTab extends JPanel {
 		JComboBox<MinecraftProfile> profileComboBox = new JComboBox<MinecraftProfile>(profiles.toArray(new MinecraftProfile[profiles.size()]));
 		JComboBox<MinecraftVersion> versionComboBox = new JComboBox<MinecraftVersion>(versions.toArray(new MinecraftVersion[versions.size()]));
 
+        profileProvider.addSaveHandler(profile -> profileComboBox.addItem(profile));
+        profileProvider.addRemoveHandler(profile -> profileComboBox.removeItem(profile));
+
+
 		JButton btn = new JButton();
         for (JComponent jc : new JComponent[] { profileComboBox, versionComboBox, btn }) {
             jc.setFocusable(false);

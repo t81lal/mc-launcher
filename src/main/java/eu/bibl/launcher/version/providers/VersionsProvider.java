@@ -1,9 +1,9 @@
 package eu.bibl.launcher.version.providers;
 
+import eu.bibl.launcher.version.json.MinecraftVersion;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import eu.bibl.launcher.version.json.MinecraftVersion;
 
 public abstract class VersionsProvider {
 	
