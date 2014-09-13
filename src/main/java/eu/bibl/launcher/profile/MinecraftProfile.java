@@ -95,6 +95,13 @@ public class MinecraftProfile {
 		return auth;
 	}
 	
+	public boolean isLoggedIn(ProfileProvider provider) {
+		YggdrasilUserAuthentication auth = provider.getAuth(this);
+		if (auth == null)
+			return false;
+		return auth.isLoggedIn();
+	}
+	
 	public String getClientToken() {
 		return clientToken;
 	}

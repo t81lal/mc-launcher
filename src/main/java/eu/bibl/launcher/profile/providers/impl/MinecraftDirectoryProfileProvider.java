@@ -1,18 +1,20 @@
 package eu.bibl.launcher.profile.providers.impl;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import eu.bibl.banalysis.AnalysisCore;
+import eu.bibl.eventbus.BusRegistry;
 import eu.bibl.launcher.FileConstants;
 import eu.bibl.launcher.profile.MinecraftProfile;
+import eu.bibl.launcher.profile.events.ProfileAddEvent;
+import eu.bibl.launcher.profile.events.ProfileRemoveEvent;
 import eu.bibl.launcher.profile.providers.ProfileProvider;
 
-import java.io.*;
-
-/**
- * Profile provider.
- *
- * @author Ddong
- * @since Aug 30, 2014
- */
 public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 	
 	private final File directory;
@@ -27,13 +29,13 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 			throw new IOException("Missing profile directory!");
 		}
 		
-		final File[] profileFolders = directory.listFiles();
-		for (final File jsonFile : profileFolders) {
+		File[] profileFolders = directory.listFiles();
+		for (File jsonFile : profileFolders) {
 			try {
 				if (!jsonFile.exists()) {
 					throw new IOException(jsonFile.getAbsolutePath() + " does not exist");
 				}
-			} catch (final IOException exception) {
+			} catch (IOException exception) {
 				System.out.println(exception.getMessage() + ", skipping.");
 				continue;
 			}
@@ -42,6 +44,7 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 				String json = readFile(jsonFile);
 				MinecraftProfile profile = AnalysisCore.GSON_INSTANCE.fromJson(json, MinecraftProfile.class);
 				loadedProfiles.add(profile);
+				BusRegistry.getInstance().getGlobalBus().dispatch(new ProfileAddEvent(profile));
 			} catch (IOException e) {
 				System.out.println("Unable to read json file: " + jsonFile.getAbsolutePath());
 				e.printStackTrace();
@@ -81,7 +84,7 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 		writer.write(jsonString);
 		writer.close();
 		loadedProfiles.add(profile);
-        onSave(profile);
+		BusRegistry.getInstance().getGlobalBus().dispatch(new ProfileAddEvent(profile));
 	}
 	
 	@Override
@@ -93,6 +96,6 @@ public class MinecraftDirectoryProfileProvider extends ProfileProvider {
 		// fixed it
 		loadedProfiles.remove(profile);
 		// this
-        onRemove(profile);
+		BusRegistry.getInstance().getGlobalBus().dispatch(new ProfileRemoveEvent(profile));
 	}
 }
