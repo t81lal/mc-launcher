@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -67,10 +66,19 @@ public final class LaunchManager {
 	}
 	
 	private Process startGame() throws IOException {
-		System.out.println(Arrays.toString(args.toArray()));
+		System.out.println("Starting game with: " + concat(args));
 		ProcessBuilder builder = new ProcessBuilder(args);
 		builder.redirectErrorStream(true);
 		return builder.start();
+	}
+	
+	private static String concat(List<String> args) {
+		StringBuilder sb = new StringBuilder();
+		for (String arg : args) {
+			sb.append(arg + " ");
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		return sb.toString();
 	}
 	
 	public static void launch(MinecraftVersion version, MinecraftProfile profile, YggdrasilUserAuthentication userAuth) throws Exception {

@@ -1,9 +1,9 @@
 package eu.bibl.launcher.version.providers;
 
-import eu.bibl.launcher.version.json.MinecraftVersion;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.bibl.launcher.version.json.MinecraftVersion;
 
 public abstract class VersionsProvider {
 	
@@ -14,6 +14,16 @@ public abstract class VersionsProvider {
 	}
 	
 	public abstract void load() throws Exception;
+	
+	public MinecraftVersion getByName(String name) {
+		if (name == null)
+			return null;
+		for (MinecraftVersion version : loadedVersions) {
+			if (name.equals(version.getId()))
+				return version;
+		}
+		return null;
+	}
 	
 	public final List<MinecraftVersion> getLoadedVersions() {
 		return loadedVersions;

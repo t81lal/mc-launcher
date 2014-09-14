@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import javax.swing.JPanel;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
+import eu.bibl.config.Config;
 import eu.bibl.eventbus.BusRegistry;
 import eu.bibl.eventbus.EventPriority;
 import eu.bibl.eventbus.EventTarget;
@@ -32,9 +35,11 @@ import eu.bibl.launcher.ui.components.img.ImagePanel;
 import eu.bibl.launcher.version.json.MinecraftVersion;
 import eu.bibl.launcher.version.providers.VersionsProvider;
 
-public class LaunchTab extends JPanel implements ActionListener, Runnable {
+public class LaunchTab extends JPanel implements ActionListener, Runnable, ItemListener {
 	
 	private static final long serialVersionUID = 7139353926454146541L;
+	
+	public static final String SELECTED_VERSION_KEY = "version.selected";
 	
 	private ProfileProvider profileProvider;
 	private VersionsProvider versionsProvider;
@@ -82,6 +87,14 @@ public class LaunchTab extends JPanel implements ActionListener, Runnable {
 		List<MinecraftVersion> versions = versionsProvider.getLoadedVersions();
 		profileComboBox = new JComboBox<MinecraftProfile>(profiles.toArray(new MinecraftProfile[profiles.size()]));
 		versionComboBox = new JComboBox<MinecraftVersion>(versions.toArray(new MinecraftVersion[versions.size()]));
+		versionComboBox.addItemListener(this);
+		MinecraftVersion version = versionsProvider.getByName(Config.GLOBAL_CONFIG.getValue(SELECTED_VERSION_KEY));
+		if (version != null) {
+			versionComboBox.setSelectedItem(version);
+		} else {
+			Config.GLOBAL_CONFIG.setValue(SELECTED_VERSION_KEY, ((MinecraftVersion) versionComboBox.getSelectedItem()).getId());
+		}
+		
 		profileComboBox.setFocusable(false);
 		versionComboBox.setFocusable(false);
 		
@@ -139,8 +152,8 @@ public class LaunchTab extends JPanel implements ActionListener, Runnable {
 	
 	@EventTarget(priority = EventPriority.HIGHEST)
 	public void onGameStartEvent(GameStartEvent e) {
-		launchButton.setEnabled(false);
 		launchButton.setText("Already cheating!");
+		launchButton.setEnabled(false);
 	}
 	
 	@EventTarget(priority = EventPriority.HIGHEST)
@@ -182,6 +195,13 @@ public class LaunchTab extends JPanel implements ActionListener, Runnable {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Launch error", JOptionPane.ERROR_MESSAGE);
 			BusRegistry.getInstance().getGlobalBus().dispatch(new GameShutdownEvent());
+		}
+	}
+	
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			Config.GLOBAL_CONFIG.setValue(SELECTED_VERSION_KEY, ((MinecraftVersion) versionComboBox.getSelectedItem()).getId());
 		}
 	}
 }

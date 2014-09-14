@@ -34,12 +34,16 @@ public class Config {
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
-				load();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		configCache.add(this);
+		try {
+			load();
+			configCache.add(this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public Config(File file) {
@@ -87,6 +91,17 @@ public class Config {
 		}
 	}
 	
+	public <T> T getValue(String key) {
+		try {
+			@SuppressWarnings("unchecked")
+			T val = (T) values.get(key);
+			return val;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public void setValue(String key, Object val) {
 		values.put(key, val);
 	}
@@ -94,6 +109,7 @@ public class Config {
 	class ConfigSaverRunnable implements Runnable {
 		@Override
 		public void run() {
+			System.out.println("Saving configs.");
 			for (Config config : configCache) {
 				try {
 					config.save();
