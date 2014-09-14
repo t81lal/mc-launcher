@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import eu.bibl.eventbus.BusRegistry;
+import eu.bibl.launcher.game.events.GameShutdownEvent;
+
 public final class ProcessMonitor extends Thread {
 	
 	private Process process;
@@ -38,5 +41,7 @@ public final class ProcessMonitor extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		BusRegistry.getInstance().getGlobalBus().dispatch(new GameShutdownEvent());
 	}
 }
