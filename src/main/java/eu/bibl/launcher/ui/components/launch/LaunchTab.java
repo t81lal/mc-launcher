@@ -179,6 +179,8 @@ public class LaunchTab extends JPanel implements ActionListener, Runnable, ItemL
 				JOptionPane.showMessageDialog(this, "Invalid profile: " + profile.getLoginUsername(), "Launch error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+		} else {
+			auth = profileProvider.getAuth(profile);
 		}
 		
 		MinecraftVersion version = (MinecraftVersion) versionComboBox.getSelectedItem();

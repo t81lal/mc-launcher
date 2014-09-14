@@ -133,10 +133,10 @@ public final class LaunchManager {
 					parts[i] = version.getAssets();
 					break;
 				case "${auth_uuid}":
-					parts[i] = profile.getClientToken();
+					parts[i] = auth.getAuthenticationService().getClientToken().replace("-", "");
 					break;
 				case "${auth_access_token}":
-					parts[i] = profile.getAuthenticatedToken();
+					parts[i] = auth.getAuthenticatedToken().replace("-", "");
 					break;
 				case "${user_properties}":
 					parts[i] = auth.getUserProperties().toString();
